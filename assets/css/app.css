@@ -6,6 +6,11 @@ html, body {
    overflow-y: hidden;
 }
 
+#filter-results td {
+  font-size: .75em;
+  font-weight: bold;
+}
+
 footer {
   position: absolute;
   bottom: 0;
