@@ -6,6 +6,12 @@ html, body {
    overflow-y: hidden;
 }
 
+footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+
 @media (min-width: 576px) {
   .container, .container-sm, .container-md {
     max-width: 95%;
