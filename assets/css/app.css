@@ -1,0 +1,19 @@
+html, body {
+  height: 100%;
+}
+
+#filter-results {
+   overflow-y: hidden;
+}
+
+@media (min-width: 576px) {
+  .container, .container-sm, .container-md {
+    max-width: 95%;
+  }
+}
+
+@media (min-width: 768px) {
+  .container, .container-sm, .container-md {
+    max-width: 97%;
+  }
+}
