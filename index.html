@@ -6,10 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Bellybutton Biodiversity</title>
-  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
-    integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-  <link href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.0/flatly/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-mhpbKVUOPCSocLzx2ElRISIORFRwr1ZbO9bAlowgM5kO7hnpRBe+brVj8NNPUiFs" crossorigin="anonymous">
+  <link rel="stylesheet" href="assets/css/font-awesome.min.css">
+  <link rel="stylesheet" href="assets/css/bootstrap.min.css">
   <link rel="stylesheet" href="assets/css/app.css">
 </head>
 
@@ -31,7 +29,7 @@
   </header>
   <div class="container mt-0 mt-sm-2 mt-md-4">
     <div class="row mt-4">
-      <aside class="col-sm-3">
+      <aside class="col-md-3">
         <div class="card p-2 text-white bg-info">
           <div class="card-group-item ">
             <form>
@@ -58,29 +56,31 @@
           </article>
         </div>
       </aside>
-      <main class="col-sm-9">
+      <main class="col-md-9">
         <div class="row">
           <div class="col-md-6 mt-3 mt-md-0">
-            <div id="bar" class="d-none">
-              <div class="card bg-dark" style="width: 100%; height:600px;"></div>
+            <div id="bar" class="responsive-plot d-none">
             </div>
           </div>
           <div class="col-md-6 mt-3 mt-md-0">
-            <div id="gauge" class="d-none">
-              <div class="card bg-success" style="width: 100%; height:600px;"></div>
+            <div id="gauge" class="responsive-plot d-none">
             </div>
           </div>
         </div>
       </main>
+    </div>
+    <div class="row">
+      <div class="col-sm-12 mt-3 mt-md-0">
+        <div id="bubbles" class="responsive-plot d-none"></div>
+      </div>
     </div>
   </div>
   <!-- <footer id="footer" class="text-white bg-primary mt-3 p-3">
     <p class="text-center">Copyright 2020</p>
   </footer> -->
 
-
-  <script src="https://d3js.org/d3.v5.min.js"></script>
-  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="assets/js/d3.min.js"></script>
+  <script src="assets/js/plotly-latest.min.js"></script>
   <script src="assets/js/app.js"></script>
 
 </body>
