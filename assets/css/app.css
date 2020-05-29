@@ -4,10 +4,6 @@ html, body {
 body {
   background-color: aliceblue;
 }
-body > header {
-  background-image: url('assets/images/biodiverstiy.jpg');
-  background-size: cover;
-}
 
 body > header i {
   text-shadow: 3px 2px 0 #0a0e27;
@@ -30,13 +26,18 @@ body > header p.card-text {
   font-size: .75em;
   font-weight: bold;
 }
-.responsive-plot {
+/* .responsive-plot {
   width: 100%;
   height: 100vh;
-}
+} */
 .chart {
   max-height: calc(50% + 25px) !important;
   overflow: hidden;
+}
+
+#gauge svg.main-svg > g.layer-above > g.shapelayer > path {
+  animation: 3s linear;
+  transition: 1s;
 }
 
 footer {

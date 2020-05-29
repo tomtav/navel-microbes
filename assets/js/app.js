@@ -37,6 +37,7 @@ function addFilters(data) {
 function initPlots() {
   addBarPlot()
   addGaugePlot()
+  addBubblePlot()
 }
 
 function addBarPlot() {
@@ -49,8 +50,8 @@ function addBarPlot() {
   }];
 
   let layout = {
-    width: 400,
-    height: 500,
+    /* width: 400,
+    height: 500, */
     title: '<b>Top # Microbial Species Found</b>',
   };
 
@@ -128,8 +129,8 @@ function addGaugePlot() {
       }
     }],
     title: '<b>Belly Button Washing Frequency</b> <br> Scrubs per Week',
-    width: 500,
-    height: 500,
+    /* width: 500,
+    height: 500, */
     xaxis: {
       zeroline: false,
       showticklabels: false,
@@ -147,11 +148,46 @@ function addGaugePlot() {
   Plotly.newPlot('gauge', data, layout, { responsive: true });
 }
 
+function addBubblePlot() {
+
+  // declare plot values
+  let x_values = [1]
+  let y_values = [1]
+  let text_values = [1]
+
+  // plot data
+  let data = [{
+    x: x_values,
+    y: y_values,
+    text: text_values,
+    mode: 'markers',
+    marker: {
+      size: y_values,
+      sizeref: 2.0 * Math.max(...y_values) / (100 ** 2),
+      color: x_values,
+      sizemode: 'area'
+    }
+  }];
+
+  // plot layout configuration
+  let layout = {
+    title: '<b>All Microbial Species Found</b>',
+    xaxis: { title: 'OTU ID', range: [0, 1] },
+    yaxis: { range: [0, 1] },
+    showlegend: false,
+    /* height: 600,
+    width: 1000 */
+  };
+
+  // add plot to page
+  Plotly.newPlot('bubbles', data, layout, { responsive: true });
+}
+
 function updateSite() {
   let id = this.value;
 
   if (id === 'None') {
-    //hideElements();
+    hideElements();
   } else {
 
     let found = studies.samples.filter(sample => sample.id === id);
@@ -168,6 +204,8 @@ function showElements() {
   d3.select('#bar').classed('d-block', true);
   d3.select('#gauge').classed('d-block', true);
   d3.select('#bubbles').classed('d-block', true);
+  d3.select('#no-selection').classed('d-block', false);
+  resizePlots()
 }
 
 function hideElements() {
@@ -175,6 +213,7 @@ function hideElements() {
   d3.select('#bar').classed('d-block', false);
   d3.select('#gauge').classed('d-block', false);
   d3.select('#bubbles').classed('d-block', false);
+  d3.select('#no-selection').classed('d-block', true);
 }
 
 function updateMetadata(id) {
@@ -202,7 +241,7 @@ function updateMetadata(id) {
     .html(column => column);
 
   // display demographics table
-  results.classed('d-block', true)
+  //results.classed('d-block', true)
 
   // remove unnecessary table rows
   rows.exit().remove()
@@ -214,10 +253,10 @@ function updateCharts(id) {
 
   updateBarH(id)
   updateGauge(id)
-  //updateBubbles(id)
+  updateBubbles(id)
   showElements()
 
-  console.log(`updating charts with study data for id ${id}`)
+  console.log(`updating charts for subject ${id}'s data`)
 
 }
 
@@ -225,12 +264,12 @@ function updateBarH(id) {
 
   // select the study to chart
   let study = studies.samples.filter(d => d.id === id)[0]
-  console.log('plotBarH for study : ', study)
+  console.log('study retireved for bar plot : ', study)
 
   // select the top 10 values, reverse their order, and store in variables
-  let x_values = study.sample_values.splice(0, 10).reverse()
-  let y_labels = study.otu_ids.map(d => 'OTU '.concat(d)).splice(0, 10).reverse()
-  let hover_labels = study.otu_labels.splice(0, 10).reverse()
+  let x_values = [...study.sample_values].splice(0, 10).reverse()
+  let y_labels = [...study.otu_ids].map(d => 'OTU '.concat(d)).splice(0, 10).reverse()
+  let hover_labels = [...study.otu_labels].splice(0, 10).reverse()
 
   // plot data
   let data = [{
@@ -272,7 +311,7 @@ function updateGauge(id) {
 
   // retrieve id's metadata
   let metadata = studies.metadata.filter(sample => sample.id === +id)[0];
-  console.log('metadata retireved for gauge : ', metadata)
+  console.log('metadata retireved for gauge plot : ', metadata)
 
   // plot data
   var data = [{
@@ -311,3 +350,96 @@ function updateGauge(id) {
     }
   })
 }
+
+function updateBubbles(id) {
+
+  // retrieve id's study information
+  let study = studies.samples.filter(d => d.id === id)[0];
+  console.log('study retireved for bubble chart : ', study)
+
+  // declare plot values
+  let x_values = study.otu_ids;
+  let y_values = study.sample_values;
+  let text_values = study.otu_labels;
+
+  // plot data
+  let data = [{
+    x: x_values,
+    y: y_values,
+    text: text_values,
+    mode: 'markers',
+    marker: {
+      size: y_values,
+      sizeref: 2.0 * Math.max(...y_values) / (100 ** 2),
+      color: x_values,
+      sizemode: 'area'
+    }
+  }];
+
+  // plot layout configuration
+  let layout = {
+    xaxis: { title: 'OTU ID', range: [0, d3.max(x_values) + (d3.max(x_values) * .15)] },
+    yaxis: { range: [0, d3.max(y_values) + (d3.max(y_values) * .15)] },
+  };
+
+  // animate plot update
+  Plotly.animate('bubbles', {
+    data: data,
+    traces: [0],
+    layout: layout
+  }, {
+    transition: {
+      duration: 500,
+      easing: 'cubic-in-out'
+    },
+    frame: {
+      duration: 500
+    }
+  })
+}
+
+function resizePlots() {
+  var WIDTH_IN_PERCENT_OF_PARENT = 100,
+    HEIGHT_IN_PERCENT_OF_PARENT = 90;
+
+  var g3 = Plotly.d3.selectAll('.responsive-plot')
+    .style({
+      width: WIDTH_IN_PERCENT_OF_PARENT + '%',
+      'margin-left': (100 - WIDTH_IN_PERCENT_OF_PARENT) / 2 + '%',
+
+      height: HEIGHT_IN_PERCENT_OF_PARENT + 'vh',
+      'margin-top': (100 - HEIGHT_IN_PERCENT_OF_PARENT) / 2 + 'vh'
+    });
+
+  var nodes_to_resize = g3[0];
+  console.log(nodes_to_resize)
+
+  for (var i = 0; i < nodes_to_resize.length; i++) {
+    Plotly.Plots.resize(nodes_to_resize[i]);
+  }
+}
+
+
+// Make Plots Responsive
+(function () {
+  var WIDTH_IN_PERCENT_OF_PARENT = 100,
+    HEIGHT_IN_PERCENT_OF_PARENT = 90;
+
+  var g3 = Plotly.d3.selectAll('.responsive-plot')
+    .style({
+      width: WIDTH_IN_PERCENT_OF_PARENT + '%',
+      'margin-left': (100 - WIDTH_IN_PERCENT_OF_PARENT) / 2 + '%',
+
+      height: HEIGHT_IN_PERCENT_OF_PARENT + 'vh',
+      'margin-top': (100 - HEIGHT_IN_PERCENT_OF_PARENT) / 2 + 'vh'
+    });
+
+  var nodes_to_resize = g3[0];
+  window.onresize = function () {
+    console.log('Resizing plots')
+    for (var i = 0; i < nodes_to_resize.length; i++) {
+      Plotly.Plots.resize(nodes_to_resize[i]);
+    }
+  }
+
+})();
