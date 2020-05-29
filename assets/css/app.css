@@ -1,6 +1,26 @@
 html, body {
   height: 100%;
 }
+body {
+  background-color: aliceblue;
+}
+body > header {
+  background-image: url('assets/images/biodiverstiy.jpg');
+  background-size: cover;
+}
+
+body > header i {
+  text-shadow: 3px 2px 0 #0a0e27;
+}
+
+body > header h1.card-title {
+  font-size: 2rem;
+  text-shadow: 2px 2px 0 #0a0e27;
+}
+
+body > header p.card-text {
+  text-shadow: 1px 1px 0 #0a0e27;
+}
 
 #filter-results {
    overflow-y: hidden;
@@ -26,6 +46,9 @@ footer {
 }
 
 @media (min-width: 576px) {
+    body > header h1.card-title {
+    font-size: 3rem;
+  }
   .container, .container-sm, .container-md {
     max-width: 95%;
   }

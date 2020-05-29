@@ -13,7 +13,21 @@
 
 <body>
   <header>
-    <div class="card shadow text-white bg-primary rounded-0" style="width: 100%;">
+    <div class="card bg-dark text-white rounded-0" style="height: 10em; overflow:hidden;">
+      <img class="card-img" src="assets/images/biodiversity.jpg" alt="Card image">
+      <div class="card-img-overlay">
+        <div class="row no-gutters">
+          <div class="d-none d-md-block col-md-2">
+            <h2 class="text-right"><i class="fa fa-flask fa-3x"></i></h2>
+          </div>
+          <div class="col-sm-12 col-md-10">
+            <h1 class="card-title">Biodiversity Dashboard</h1>
+            <p class="card-text">Use the interactive charts below to explore the dataset</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="card shadow text-white bg-primary rounded-0" style="width: 100%;">
       <div class="row no-gutters">
         <div class="d-none d-md-block col-md-2">
           <h2 class="text-right"><i class="fa fa-flask fa-3x"></i></h2>
@@ -25,7 +39,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
   </header>
   <div class="container mt-0 mt-sm-2 mt-md-4">
     <div class="row mt-4">
@@ -59,11 +73,11 @@
       <main class="col-md-9">
         <div class="row">
           <div class="col-md-6 mt-3 mt-md-0">
-            <div id="bar" class="responsive-plot d-none">
+            <div id="bar" class="d-none">
             </div>
           </div>
           <div class="col-md-6 mt-3 mt-md-0">
-            <div id="gauge" class="responsive-plot d-none">
+            <div id="gauge" class="d-none">
             </div>
           </div>
         </div>
