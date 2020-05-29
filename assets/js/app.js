@@ -50,8 +50,8 @@ function addBarPlot() {
   }];
 
   let layout = {
-    /* width: 400,
-    height: 500, */
+    width: 400,
+    height: 500,
     title: '<b>Top # Microbial Species Found</b>',
   };
 
@@ -129,8 +129,8 @@ function addGaugePlot() {
       }
     }],
     title: '<b>Belly Button Washing Frequency</b> <br> Scrubs per Week',
-    /* width: 500,
-    height: 500, */
+    width: 500,
+    height: 500,
     xaxis: {
       zeroline: false,
       showticklabels: false,
