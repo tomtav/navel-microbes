@@ -5,12 +5,13 @@ var studies = [];
 d3.json('assets/data/samples.json')
   .then((data) => {
     studies = data;
-    createFilter(data)
+    addFilters(data)
+    initPlots()
   })
   .catch((error) => console.error(error));
 
 
-function createFilter(data) {
+function addFilters(data) {
   if (data.names) {
     // generate an object containing the filter objects
     filterOptions = [...new Set(data.names)];
@@ -33,11 +34,124 @@ function createFilter(data) {
   }
 }
 
+function initPlots() {
+  addBarPlot()
+  addGaugePlot()
+}
+
+function addBarPlot() {
+  let data = [{
+    x: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    y: ['lable1', 'label2', 'label3', 'label4', 'label5', 'label6', 'label7', 'label8', 'label9', 'label10'],
+    type: 'bar',
+    text: ['lable1', 'label2', 'label3', 'label4', 'label5', 'label6', 'label7', 'label8', 'label9', 'label10'],
+    orientation: 'h',
+  }];
+
+  let layout = {
+    width: 400,
+    height: 500,
+    title: '<b>Top # Microbial Species Found</b>',
+  };
+
+  Plotly.newPlot('bar', data, layout, { responsive: true })
+}
+
+function gaugePointer(num) {
+  // Enter the washing frequency (must multiply by 20 (180/9))
+  var level = num * 20;
+
+  // Trig to calc meter point
+  var degrees = 180 - level,
+    radius = .65;
+  var radians = degrees * Math.PI / 180;
+  var x = radius * Math.cos(radians);
+  var y = radius * Math.sin(radians);
+
+  // Path: create a triangle
+  var mainPath = 'M -.0 -0.025 L .0 0.025 L ',
+    pathX = String(x),
+    space = ' ',
+    pathY = String(y),
+    pathEnd = ' Z';
+  var path = mainPath.concat(pathX, space, pathY, pathEnd);
+
+  return path;
+}
+
+function addGaugePlot() {
+
+  data = [{
+    type: 'scatter',
+    x: [0], y: [0],
+    marker: { size: 20, color: '850000' },
+    showlegend: false,
+    name: 'scrubs',
+    text: 0,
+    hoverinfo: 'text+name'
+  },
+  {
+    values: [1, 1, 1, 1, 1, 1, 1, 1, 1, 9],
+    rotation: 90,
+    text: ['8-9', '7-8', '6-7', '5-6', '4-5', '3-4', '2-3', '1-2', '0-1', ''],
+    textinfo: 'text',
+    textposition: 'inside',
+    marker: {
+      colors: [
+        "rgba(133, 180, 138, 1)",
+        "rgba(138, 187, 143, 1)",
+        "rgba(140, 191, 136, 1)",
+        "rgba(183, 204, 146, 1)",
+        "rgba(213, 228, 157, 1)",
+        "rgba(229, 231, 179, 1)",
+        "rgba(233, 230, 202, 1)",
+        "rgba(244, 241, 229, 1)",
+        "rgba(248, 243, 236, 1)",
+        "rgba(255, 255, 255, 1)"
+      ]
+    },
+    labels: ['8-9', '7-8', '6-7', '5-6', '4-5', '3-4', '2-3', '1-2', '0-1', ''],
+    hoverinfo: 'label',
+    hole: .5,
+    type: 'pie',
+    showlegend: false,
+  }
+  ];
+
+  layout = {
+    shapes: [{
+      type: 'path',
+      path: gaugePointer(0),
+      fillcolor: '850000',
+      line: {
+        color: '850000'
+      }
+    }],
+    title: '<b>Belly Button Washing Frequency</b> <br> Scrubs per Week',
+    width: 500,
+    height: 500,
+    xaxis: {
+      zeroline: false,
+      showticklabels: false,
+      showgrid: false,
+      range: [-1, 1]
+    },
+    yaxis: {
+      zeroline: false,
+      showticklabels: false,
+      showgrid: false,
+      range: [-1, 1]
+    }
+  };
+
+  Plotly.newPlot('gauge', data, layout, { responsive: true });
+}
+
 function updateSite() {
   let id = this.value;
 
   if (id === 'None') {
-    hideElements();
+    //hideElements();
   } else {
 
     let found = studies.samples.filter(sample => sample.id === id);
@@ -49,10 +163,18 @@ function updateSite() {
   }
 }
 
+function showElements() {
+  d3.select('#filter-results').classed('d-block', true);
+  d3.select('#bar').classed('d-block', true);
+  d3.select('#gauge').classed('d-block', true);
+  d3.select('#bubbles').classed('d-block', true);
+}
+
 function hideElements() {
   d3.select('#filter-results').classed('d-block', false);
   d3.select('#bar').classed('d-block', false);
   d3.select('#gauge').classed('d-block', false);
+  d3.select('#bubbles').classed('d-block', false);
 }
 
 function updateMetadata(id) {
@@ -90,188 +212,102 @@ function updateMetadata(id) {
 
 function updateCharts(id) {
 
+  updateBarH(id)
+  updateGauge(id)
+  //updateBubbles(id)
+  showElements()
 
-  plotBarH(id)
-  plotGauge(id)
-  plotBubbles(id)
-
-  d3.select('#bar').classed('d-block', true);
-  d3.select('#gauge').classed('d-block', true);
-  d3.select('#bubbles').classed('d-block', true);
-  resizePlots();
   console.log(`updating charts with study data for id ${id}`)
 
 }
 
-function resizePlots() {
-  var WIDTH_IN_PERCENT_OF_PARENT = 100,
-    HEIGHT_IN_PERCENT_OF_PARENT = 90;
-
-  var g3 = d3.selectAll('.responsive-plot')
-    .style({
-      width: WIDTH_IN_PERCENT_OF_PARENT + '%',
-      'margin-left': (100 - WIDTH_IN_PERCENT_OF_PARENT) / 2 + '%',
-
-      height: HEIGHT_IN_PERCENT_OF_PARENT + 'vh',
-      'margin-top': (100 - HEIGHT_IN_PERCENT_OF_PARENT) / 2 + 'vh'
-    });
-
-  var nodes_to_resize = gd3[0];
-
-  window.onresize = function () {
-    for (var i = 0; i < nodes_to_resize.length; i++) {
-      Plotly.Plots.resize(nodes_to_resize[i]);
-    }
-  }
-}
-
-
-function plotBarH(id) {
+function updateBarH(id) {
 
   // select the study to chart
   let study = studies.samples.filter(d => d.id === id)[0]
   console.log('plotBarH for study : ', study)
 
-  let x_values = study.sample_values
-  let y_labels = study.otu_ids.map(d => 'OTU '.concat(d))
-  let hover_labels = study.otu_labels
+  // select the top 10 values, reverse their order, and store in variables
+  let x_values = study.sample_values.splice(0, 10).reverse()
+  let y_labels = study.otu_ids.map(d => 'OTU '.concat(d)).splice(0, 10).reverse()
+  let hover_labels = study.otu_labels.splice(0, 10).reverse()
 
+  // plot data
   let data = [{
-    x: x_values.splice(0, 10).reverse(),
-    y: y_labels.splice(0, 10).reverse(),
+    x: x_values,
+    y: y_labels,
     type: 'bar',
-    text: hover_labels.splice(0, 10).reverse(),
+    text: hover_labels,
     orientation: 'h',
   }];
 
+  // get the maximum value on the x-axis
+  // in order to update the layout's xaxis range
+  xaxis_max = d3.max(x_values)
+
+  // udpate plot title
   let layout = {
-    /* width: 400,
-    height: 500, */
-    title: '<b>Top 10 Microbial Species Found</b>'
+    title: `<b>Top ${y_labels.length} Microbial Species Found</b>`,
+    xaxis: { range: [0, xaxis_max] },
   };
 
-  Plotly.newPlot('bar', data, layout, { responsive: true })
+  // animate plot update
+  Plotly.animate('bar', {
+    data: data,
+    traces: [0],
+    layout: layout
+  }, {
+    transition: {
+      duration: 500,
+      easing: 'cubic-in-out'
+    },
+    frame: {
+      duration: 500
+    }
+  })
 
 }
 
-function plotGauge(id) {
+function updateGauge(id) {
 
   // retrieve id's metadata
   let metadata = studies.metadata.filter(sample => sample.id === +id)[0];
-  console.log('metadata retireved for gauge2 : ', metadata)
+  console.log('metadata retireved for gauge : ', metadata)
 
-  // Enter the washing frequency (must multiply 180/9)
-  var level = metadata.wfreq * 20;
-
-  // Trig to calc meter point
-  var degrees = 180 - level,
-    radius = .5;
-  var radians = degrees * Math.PI / 180;
-  var x = radius * Math.cos(radians);
-  var y = radius * Math.sin(radians);
-
-  // Path: create a triangle
-  var mainPath = 'M -.0 -0.025 L .0 0.025 L ',
-    pathX = String(x),
-    space = ' ',
-    pathY = String(y),
-    pathEnd = ' Z';
-  var path = mainPath.concat(pathX, space, pathY, pathEnd);
-
+  // plot data
   var data = [{
     type: 'scatter',
     x: [0], y: [0],
-    marker: { size: 28, color: '850000' },
+    marker: { size: 20, color: '850000' },
     showlegend: false,
     name: 'scrubs',
     text: metadata.wfreq,
     hoverinfo: 'text+name'
-  },
-  {
-    values: [1, 1, 1, 1, 1, 1, 1, 1, 1, 9],
-    rotation: 90,
-    text: ['8-9', '7-8', '6-7', '5-6', '4-5', '3-4', '2-3', '1-2', '0-1', ''],
-    textinfo: 'text',
-    textposition: 'inside',
-    marker: {
-      colors: [
-        "rgba(133, 180, 138, 1)",
-        "rgba(138, 187, 143, 1)",
-        "rgba(140, 191, 136, 1)",
-        "rgba(183, 204, 146, 1)",
-        "rgba(213, 228, 157, 1)",
-        "rgba(229, 231, 179, 1)",
-        "rgba(233, 230, 202, 1)",
-        "rgba(244, 241, 229, 1)",
-        "rgba(248, 243, 236, 1)",
-        "rgba(255, 255, 255, 1)"
-      ]
-    },
-    labels: ['8-9', '7-8', '6-7', '5-6', '4-5', '3-4', '2-3', '1-2', '0-1', ''],
-    hoverinfo: 'label',
-    hole: .5,
-    type: 'pie',
-    showlegend: false
-  }
-  ];
+  }];
 
   var layout = {
     shapes: [{
       type: 'path',
-      path: path,
+      path: gaugePointer(metadata.wfreq),
       fillcolor: '850000',
       line: {
         color: '850000'
       }
-    }],
-    title: '<b>Belly Button Washing Frequency</b> <br> Scrubs per Week',
-    /* width: 600,
-    height: 500, */
-    xaxis: {
-      zeroline: false,
-      showticklabels: false,
-      showgrid: false,
-      fixedrange: true,
-      range: [-1, 1]
-    },
-    yaxis: {
-      zeroline: false,
-      showticklabels: false,
-      showgrid: false,
-      fixedrange: true,
-      range: [-1, 1]
-    }
+    }]
   };
 
-  Plotly.newPlot('gauge', data, layout, { responsive: true });
-}
-
-
-
-
-// Make Plots Responsive
-(function () {
-  var WIDTH_IN_PERCENT_OF_PARENT = 100,
-    HEIGHT_IN_PERCENT_OF_PARENT = 90;
-
-  var g3 = d3.selectAll('.responsive-plot')
-    .style({
-      width: WIDTH_IN_PERCENT_OF_PARENT + '%',
-      'margin-left': (100 - WIDTH_IN_PERCENT_OF_PARENT) / 2 + '%',
-
-      height: HEIGHT_IN_PERCENT_OF_PARENT + 'vh',
-      'margin-top': (100 - HEIGHT_IN_PERCENT_OF_PARENT) / 2 + 'vh'
-    });
-
-  resizePlots();
-
-  var nodes_to_resize = gd3[0];
-  window.onresize = resizePlots();
-
-  function resizePlots() {
-    for (var i = 0; i < nodes_to_resize.length; i++) {
-      Plotly.Plots.resize(nodes_to_resize[i]);
+  // animate plot update
+  Plotly.animate('gauge', {
+    data: data,
+    traces: [0],
+    layout: layout
+  }, {
+    transition: {
+      duration: 500,
+      easing: 'cubic-in-out'
+    },
+    frame: {
+      duration: 500
     }
-  }
-
-})();
+  })
+}
